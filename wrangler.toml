@@ -1,0 +1,15 @@
+# Cloudflare Workers configuration.
+#
+# This project is a fully static site, so it deploys as a Workers "static
+# assets" project — there is no Worker script (`main`); Cloudflare serves the
+# files in the asset directory directly. The repo is connected to Cloudflare
+# Workers Builds, which runs `wrangler deploy` using this config on each push.
+#
+# Only the published site lives in ./public, so dev tooling (tests, the local
+# server, CI config) is naturally excluded from the upload.
+
+name = "transliterate-me"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "./public"
