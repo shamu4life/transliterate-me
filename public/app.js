@@ -266,7 +266,11 @@ function applyTheme(theme) {
 }
 
 function initTheme() {
-  applyTheme(readTheme());
+  // A ?theme= override (shareable links, on-demand screenshots) wins for the
+  // initial view but isn't persisted, so it won't clobber a saved preference.
+  let urlTheme = null;
+  try { urlTheme = new URLSearchParams(location.search).get('theme'); } catch { /* no URL */ }
+  applyTheme(THEMES.includes(urlTheme) ? urlTheme : readTheme());
   for (const opt of el('theme-switch').querySelectorAll('.theme-opt')) {
     opt.addEventListener('click', () => {
       try { localStorage.setItem('theme', opt.dataset.themeChoice); } catch { /* storage blocked */ }

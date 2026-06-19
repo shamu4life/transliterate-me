@@ -7,10 +7,12 @@
   <meta name="description"
     content="Transliterate English into Japanese, Korean, Russian, Greek, Arabic, Hebrew, or Chinese by way of IPA — or romanize those scripts back into the Latin alphabet." />
   <script>
-    // Apply a remembered light/dark choice before first paint (avoids a flash).
-    // No saved choice = "auto": the stylesheet follows the device preference.
+    // Apply a theme before first paint (avoids a flash). An explicit ?theme=
+    // override wins (handy for shareable links and on-demand screenshots), then
+    // a remembered choice; no choice = "auto", following the device preference.
     try {
-      var t = localStorage.getItem('theme');
+      var q = new URLSearchParams(location.search).get('theme');
+      var t = (q === 'light' || q === 'dark') ? q : localStorage.getItem('theme');
       if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
     } catch (e) {}
   </script>
