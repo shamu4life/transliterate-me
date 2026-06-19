@@ -245,7 +245,6 @@ function wireCopy(buttonId, sourceId) {
 
 // ---- Theme: auto (follow device) / light / dark, remembered ----
 const THEMES = ['auto', 'light', 'dark'];
-const THEME_ICON = { auto: '🖥️', light: '☀️', dark: '🌙' };
 
 function readTheme() {
   let t = null;
@@ -254,24 +253,26 @@ function readTheme() {
 }
 
 // Pin the chosen theme via data-theme on <html> (or remove it for "auto", which
-// lets the stylesheet's prefers-color-scheme media query follow the device).
+// lets the stylesheet's prefers-color-scheme media query follow the device),
+// and reflect the active choice in the segmented slider.
 function applyTheme(theme) {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
-  const btn = el('theme-toggle');
-  const label = theme[0].toUpperCase() + theme.slice(1);
-  btn.textContent = `${THEME_ICON[theme]} ${label}`;
-  btn.setAttribute('aria-label', `Theme: ${label} (click to change)`);
-  btn.title = btn.getAttribute('aria-label');
+  const sw = el('theme-switch');
+  sw.dataset.active = theme;
+  for (const opt of sw.querySelectorAll('.theme-opt')) {
+    opt.setAttribute('aria-pressed', String(opt.dataset.themeChoice === theme));
+  }
 }
 
 function initTheme() {
   applyTheme(readTheme());
-  el('theme-toggle').addEventListener('click', () => {
-    const next = THEMES[(THEMES.indexOf(readTheme()) + 1) % THEMES.length];
-    try { localStorage.setItem('theme', next); } catch { /* storage blocked */ }
-    applyTheme(next);
-  });
+  for (const opt of el('theme-switch').querySelectorAll('.theme-opt')) {
+    opt.addEventListener('click', () => {
+      try { localStorage.setItem('theme', opt.dataset.themeChoice); } catch { /* storage blocked */ }
+      applyTheme(opt.dataset.themeChoice);
+    });
+  }
 }
 
 async function init() {

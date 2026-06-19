@@ -18,7 +18,6 @@
 </head>
 <body>
   <header class="site-header">
-    <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Theme">🖥️ Auto</button>
     <h1>Transliterate&nbsp;Me</h1>
     <p class="tagline">
       Move text between writing systems by its <em>sound</em> — a Latin-script
@@ -26,6 +25,12 @@
       <abbr title="International Phonetic Alphabet">IPA</abbr>, or other scripts
       back into the Latin alphabet.
     </p>
+    <div id="theme-switch" class="theme-switch" role="group" aria-label="Theme">
+      <span class="theme-thumb" aria-hidden="true"></span>
+      <button type="button" class="theme-opt" data-theme-choice="auto">Auto</button>
+      <button type="button" class="theme-opt" data-theme-choice="light">Light</button>
+      <button type="button" class="theme-opt" data-theme-choice="dark">Dark</button>
+    </div>
   </header>
 
   <nav class="mode-tabs" role="tablist" aria-label="Direction">
