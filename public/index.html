@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transliterate Me — between writing systems, by sound</title>
+  <meta name="description"
+    content="Transliterate English into Japanese, Korean, Russian, Greek, Arabic, Hebrew, or Chinese by way of IPA — or romanize those scripts back into the Latin alphabet." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Transliterate&nbsp;Me</h1>
+    <p class="tagline">
+      Move text between writing systems by its <em>sound</em> — a Latin-script
+      language into other scripts via
+      <abbr title="International Phonetic Alphabet">IPA</abbr>, or other scripts
+      back into the Latin alphabet.
+    </p>
+  </header>
+
+  <nav class="mode-tabs" role="tablist" aria-label="Direction">
+    <button class="mode-tab" data-mode="forward" role="tab" aria-selected="true">
+      Latin script → world scripts
+    </button>
+    <button class="mode-tab" data-mode="romanize" role="tab" aria-selected="false">
+      Any script → Latin
+    </button>
+  </nav>
+
+  <!-- ============ Mode 1: English → script (via IPA) ============ -->
+  <main id="mode-forward">
+    <section class="panel input-panel">
+      <div class="rom-controls">
+        <label class="field-label" for="input-text">Source text</label>
+        <label class="field-label" for="lang-select">Language
+          <select id="lang-select"></select>
+        </label>
+      </div>
+      <textarea id="input-text" rows="4" spellcheck="false"
+        placeholder="Type something, e.g. “hello world”…">hello world</textarea>
+      <p id="lang-note" class="quality-note"></p>
+    </section>
+
+    <section class="panel script-panel">
+      <span class="field-label">Output script</span>
+      <div id="script-chips" class="chips" role="tablist"></div>
+      <p id="quality-note" class="quality-note"></p>
+    </section>
+
+    <section class="panel output-panel">
+      <div class="output-head">
+        <span class="field-label">Result</span>
+        <button id="copy-btn" type="button" class="copy-btn">Copy</button>
+      </div>
+      <div id="output-text" class="output-text" aria-live="polite"></div>
+
+      <div class="ipa-row">
+        <span class="field-label">IPA</span>
+        <div id="ipa-text" class="ipa-text" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel breakdown-panel">
+      <span class="field-label">Word breakdown</span>
+      <table id="breakdown" class="breakdown">
+        <thead>
+          <tr><th>Word</th><th>IPA</th><th>Transliteration</th><th>Source</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- ============ Mode 2: Any script → Latin (romanize) ============ -->
+  <main id="mode-romanize" hidden>
+    <section class="panel input-panel">
+      <label class="field-label" for="rom-input">Text in another script</label>
+      <textarea id="rom-input" rows="4" spellcheck="false"
+        placeholder="Paste e.g. 中文, 日本語, 한국어, Привет, Ελληνικά…">你好世界</textarea>
+    </section>
+
+    <section class="panel script-panel">
+      <div class="rom-controls">
+        <label class="field-label" for="rom-source">Source language
+          <select id="rom-source"></select>
+        </label>
+        <label class="field-label" for="rom-tones">Pinyin tones
+          <select id="rom-tones">
+            <option value="marks">marks — pīnyīn</option>
+            <option value="numbers">numbers — pin1yin1</option>
+          </select>
+        </label>
+      </div>
+      <p id="rom-detected" class="quality-note"></p>
+    </section>
+
+    <section class="panel output-panel">
+      <div class="output-head">
+        <span class="field-label">Romanized (Latin)</span>
+        <button id="rom-copy" type="button" class="copy-btn">Copy</button>
+      </div>
+      <div id="rom-output" class="output-text" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p id="footer-forward">
+      English pronunciations come from the
+      <a href="https://github.com/cmusphinx/cmudict">CMU Pronouncing Dictionary</a>
+      (American English); other languages are phonemized by
+      <a href="https://github.com/espeak-ng/espeak-ng">espeak-ng</a> (GPL-3.0),
+      loaded on first use. Transliterations are <strong>phonetic approximations</strong>
+      — they reproduce how a word <em>sounds</em>, not its meaning or native spelling.
+    </p>
+    <p id="footer-romanize" hidden>
+      Chinese pinyin uses
+      <a href="https://github.com/zh-lx/pinyin-pro">pinyin-pro</a>, which resolves
+      context-dependent polyphones (长大 → zhǎng dà, 长城 → cháng chéng). Japanese
+      uses <a href="https://github.com/hexenq/kuroshiro">kuroshiro</a> +
+      kuromoji for full <strong>kanji + kana</strong> Hepburn romaji (私は学生です →
+      watashi wa gakusei desu); its ~18 MB dictionary loads on first use. Arabic
+      and Hebrew are abjads — unwritten short vowels can’t be recovered, so those
+      are rough approximations.
+    </p>
+  </footer>
+
+  <div id="loading" class="loading">Loading pronunciation dictionary…</div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+// Turn text into a sequence of tokens, each annotated with its pronunciation
+// (ARPABET phonemes + derived IPA). Whitespace and punctuation are preserved as
+// "other" tokens so the original layout survives.
+//
+// The grapheme-to-phoneme step is pluggable: English uses the CMU dictionary
+// plus a rule fallback, while other languages pass a language-specific rule
+// converter (and no dictionary).
+
+import { arpabetToIpa } from './arpabet.js';
+import { g2p as englishG2p } from './g2p.js';
+import { ipaToArpabet } from './ipa2arpabet.js';
+
+// Words may contain accented Latin letters (café, niño, Kraków, schön): Latin-1
+// Supplement letters and Latin Extended-A, plus internal apostrophes.
+const WORD_RE = /[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*/g;
+
+// Look up a single word's pronunciation. Tries the dictionary first (if given),
+// then the rule-based g2p. Returns { phonemes, source } or null.
+export function phonemizeWord(word, dict, g2p = englishG2p) {
+  const key = word.toLowerCase();
+  if (dict && dict.has(key)) {
+    return { phonemes: dict.get(key), source: 'dict' };
+  }
+  // Strip a possessive/plural "'s" and retry (e.g. "Anna's").
+  if (key.endsWith("'s") && dict && dict.has(key.slice(0, -2))) {
+    return { phonemes: [...dict.get(key.slice(0, -2)), 'Z'], source: 'dict' };
+  }
+  const rule = g2p(key);
+  if (rule.length) return { phonemes: rule, source: 'rule' };
+  return null;
+}
+
+// Split text into word and non-word tokens, attaching pronunciation data.
+export function phonemizeText(text, dict, g2p = englishG2p) {
+  const tokens = [];
+  let last = 0;
+  let m;
+  WORD_RE.lastIndex = 0;
+  while ((m = WORD_RE.exec(text)) !== null) {
+    if (m.index > last) {
+      tokens.push({ type: 'other', text: text.slice(last, m.index) });
+    }
+    const word = m[0];
+    const pron = phonemizeWord(word, dict, g2p);
+    tokens.push({
+      type: 'word',
+      text: word,
+      phonemes: pron ? pron.phonemes : [],
+      ipa: pron ? arpabetToIpa(pron.phonemes) : '',
+      source: pron ? pron.source : 'none',
+    });
+    last = WORD_RE.lastIndex;
+  }
+  if (last < text.length) {
+    tokens.push({ type: 'other', text: text.slice(last) });
+  }
+  return tokens;
+}
+
+// Phonemize text with espeak-ng (for non-English languages). `phonemizeLine` is
+// injected (the espeak wrapper, or a test stub). The whole line is phonemized in
+// one espeak call and the IPA is split back onto the word tokens; on a count
+// mismatch we fall back to per-word phonemization. Token shape matches
+// phonemizeText so the rest of the UI is unchanged.
+export async function phonemizeTextEspeak(text, voice, phonemizeLine) {
+  const tokens = [];
+  const wordTokenIdx = [];
+  const wordTexts = [];
+  let last = 0;
+  let m;
+  WORD_RE.lastIndex = 0;
+  while ((m = WORD_RE.exec(text)) !== null) {
+    if (m.index > last) tokens.push({ type: 'other', text: text.slice(last, m.index) });
+    wordTokenIdx.push(tokens.length);
+    wordTexts.push(m[0]);
+    tokens.push({ type: 'word', text: m[0], phonemes: [], ipa: '', source: 'espeak' });
+    last = WORD_RE.lastIndex;
+  }
+  if (last < text.length) tokens.push({ type: 'other', text: text.slice(last) });
+
+  if (wordTexts.length) {
+    const line = await phonemizeLine(wordTexts.join(' '), voice);
+    let ipaWords = line.split(/\s+/).filter(Boolean);
+    if (ipaWords.length !== wordTexts.length) {
+      ipaWords = [];
+      for (const w of wordTexts) ipaWords.push((await phonemizeLine(w, voice)).trim());
+    }
+    wordTexts.forEach((_, k) => {
+      const tok = tokens[wordTokenIdx[k]];
+      tok.ipa = ipaWords[k] || '';
+      tok.phonemes = ipaToArpabet(tok.ipa);
+    });
+  }
+  return tokens;
+}

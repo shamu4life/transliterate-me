@@ -1,0 +1,12 @@
+{
+  "name": "transliterate-me",
+  "version": "1.0.0",
+  "description": "Transliterate text between writing systems by way of IPA pronunciation.",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "test": "node --test",
+    "start": "node server.mjs",
+    "serve": "node server.mjs"
+  }
+}
