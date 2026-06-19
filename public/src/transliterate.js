@@ -11,7 +11,9 @@ import { toHebrew } from './scripts/hebrew.js';
 
 // Ordered metadata used to build the UI and drive conversion. `quality` is an
 // honest signal of how faithful the mapping is: phonetic scripts map well,
-// abjads lose vowel detail, and Chinese is only a rough approximation.
+// abjads lose vowel detail, and Chinese (logographic) is approximated with
+// valid Mandarin syllables in the name-transcription style. An optional `note`
+// overrides the generic per-quality blurb in the UI.
 export const SCRIPTS = [
   { id: 'katakana', name: 'Japanese (Katakana)', fn: toKatakana, rtl: false, quality: 'good' },
   { id: 'hangul', name: 'Korean (Hangul)', fn: toHangul, rtl: false, quality: 'good' },
@@ -19,7 +21,8 @@ export const SCRIPTS = [
   { id: 'greek', name: 'Greek', fn: toGreek, rtl: false, quality: 'fair' },
   { id: 'arabic', name: 'Arabic', fn: toArabic, rtl: true, quality: 'fair' },
   { id: 'hebrew', name: 'Hebrew', fn: toHebrew, rtl: true, quality: 'fair' },
-  { id: 'chinese', name: 'Chinese (approximate)', fn: toChinese, rtl: false, quality: 'rough' },
+  { id: 'chinese', name: 'Chinese (approximate)', fn: toChinese, rtl: false, quality: 'fair',
+    note: 'Chinese is logographic, so this approximates the sound with valid Mandarin syllables mapped to standard transcription characters (the way foreign names are written).' },
 ];
 
 const BY_ID = new Map(SCRIPTS.map((s) => [s.id, s]));

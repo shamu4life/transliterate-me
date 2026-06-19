@@ -16,7 +16,7 @@ import { initEspeak, phonemizeLine, isEspeakReady } from './src/lang/espeak.js';
 const QUALITY_TEXT = {
   good: 'Maps cleanly from pronunciation — a faithful phonetic rendering.',
   fair: 'Approximate: this script lacks some English sounds, so a few are merged.',
-  rough: 'Experimental: Chinese is logographic, so this is only a rough, nearest-syllable guess.',
+  rough: 'Experimental: only a rough, nearest-equivalent guess.',
 };
 
 const SOURCE_LABEL = {
@@ -66,7 +66,7 @@ function selectScript(id) {
   }
   const s = getScript(id);
   el('quality-note').innerHTML =
-    `<span class="quality-badge ${s.quality}">${s.quality}</span>${QUALITY_TEXT[s.quality]}`;
+    `<span class="quality-badge ${s.quality}">${s.quality}</span>${s.note || QUALITY_TEXT[s.quality]}`;
   renderForward();
 }
 
