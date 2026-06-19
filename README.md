@@ -1,5 +1,13 @@
 # Transliterate Me
 
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
+[![CI](https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml/badge.svg)](https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml)
+![Dependencies: zero](https://img.shields.io/badge/dependencies-0-brightgreen)
+![100% client-side](https://img.shields.io/badge/runs-100%25%20client--side-success)
+[![Deploy: Cloudflare Workers](https://img.shields.io/badge/deploy-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/static-assets/)
+
+**▶ [Try it live](https://funny-words.uwutoowo.com/)** — no install, runs entirely in your browser.
+
 Move text between writing systems **by its sound**, in two directions:
 
 - **Latin-script language → world scripts.** Type one of **14 languages**
@@ -18,6 +26,15 @@ Move text between writing systems **by its sound**, in two directions:
 
 This is *phonetic* transliteration: it reproduces how text **sounds**, not its
 meaning. So “coffee” becomes コーヒー-style カフィー, not the Japanese word for coffee.
+
+## Screenshots
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://image.thum.io/get/width/1280/crop/860/https://funny-words.uwutoowo.com/?theme=dark" />
+  <img alt="Transliterate Me — the forward (Latin script → world scripts) view" src="https://image.thum.io/get/width/1280/crop/860/https://funny-words.uwutoowo.com/?theme=light" />
+</picture>
+
+<sub>Rendered on demand from the live site, so it always reflects the current UI — and follows your GitHub light/dark theme. (The `?theme=` override below powers the dark/light variants.)</sub>
 
 
 > **Setup note (slim archive):** two large binaries — espeak-ng’s WASM and the
