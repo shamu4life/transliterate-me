@@ -30,11 +30,11 @@ meaning. So “coffee” becomes コーヒー-style カフィー, not the Japane
 ## Screenshots
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://image.thum.io/get/width/1280/crop/860/https://funny-words.uwutoowo.com/?theme=dark" />
-  <img alt="Transliterate Me — the forward (Latin script → world scripts) view" src="https://image.thum.io/get/width/1280/crop/860/https://funny-words.uwutoowo.com/?theme=light" />
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png" />
+  <img alt="Transliterate Me — the forward (Latin script → world scripts) view" src="docs/screenshot-light.png" />
 </picture>
 
-<sub>Rendered on demand from the live site, so it always reflects the current UI — and follows your GitHub light/dark theme. (The `?theme=` override below powers the dark/light variants.)</sub>
+<sub>The forward view (Latin script → world scripts) — switches with your GitHub light/dark theme.</sub>
 
 
 > **Setup note (slim archive):** two large binaries — espeak-ng’s WASM and the
