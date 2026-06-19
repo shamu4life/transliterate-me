@@ -139,10 +139,11 @@ tooling.
   there's no Worker script; Cloudflare serves the files directly. Cloudflare
   Workers Builds runs `wrangler deploy` on each push. To deploy by hand:
   `npx wrangler deploy`.
-- **GitHub Pages.** The included workflow (`.github/workflows/deploy.yml`) runs
-  the tests and publishes `public/` on every push to `main`. Enable it via
-  **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-- **Any static host** (Netlify, S3, …) — just serve the `public/` folder.
+- **Any static host** (GitHub Pages, Netlify, S3, …) — just serve the `public/`
+  folder.
+
+CI (`.github/workflows/ci.yml`) only runs the test suite on pushes to `main`
+and on pull requests; deployment is left to Cloudflare.
 
 [cf-assets]: https://developers.cloudflare.com/workers/static-assets/
 
