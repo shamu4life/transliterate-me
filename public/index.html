@@ -6,10 +6,19 @@
   <title>Transliterate Me — between writing systems, by sound</title>
   <meta name="description"
     content="Transliterate English into Japanese, Korean, Russian, Greek, Arabic, Hebrew, or Chinese by way of IPA — or romanize those scripts back into the Latin alphabet." />
+  <script>
+    // Apply a remembered light/dark choice before first paint (avoids a flash).
+    // No saved choice = "auto": the stylesheet follows the device preference.
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="site-header">
+    <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Theme">🖥️ Auto</button>
     <h1>Transliterate&nbsp;Me</h1>
     <p class="tagline">
       Move text between writing systems by its <em>sound</em> — a Latin-script

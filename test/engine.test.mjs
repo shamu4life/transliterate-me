@@ -109,6 +109,20 @@ test('Chinese collapses long coda clusters instead of exploding them', () => {
   assert.equal(transliteratePhonemes(['W', 'ER1', 'L', 'D'], 'chinese'), '沃勒德');
 });
 
+// Chinese and Katakana write the parts of a foreign name with an interpunct
+// (·) / nakaguro (・) rather than a space, which also gives a TTS a clean word
+// boundary. Spaced scripts keep ordinary spaces; punctuation and layout survive.
+test('Chinese and Katakana separate words with the idiomatic interpunct', () => {
+  const toks = phonemizeText('hello world', dict);
+  assert.equal(transliterateTokens(toks, 'chinese'), '哈楼·沃勒德');
+  assert.equal(transliterateTokens(toks, 'katakana'), 'ハロー・ワールド');
+  assert.equal(transliterateTokens(toks, 'cyrillic'), 'хало вэрлд'); // spaced script unchanged
+  // A separator token carrying punctuation is left alone (no interpunct added).
+  assert.doesNotMatch(transliterateTokens(phonemizeText('hi, there', dict), 'chinese'), /·/);
+  // Newlines are preserved so the original layout survives.
+  assert.match(transliterateTokens(phonemizeText('a\nb', dict), 'chinese'), /\n/);
+});
+
 test('words containing the ʒ sound transliterate everywhere', () => {
   for (const word of ['vision', 'measure', 'genre']) {
     const toks = phonemizeText(word, dict);
