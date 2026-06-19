@@ -224,7 +224,39 @@ function wireCopy(buttonId, sourceId) {
   });
 }
 
+// ---- Theme: auto (follow device) / light / dark, remembered ----
+const THEMES = ['auto', 'light', 'dark'];
+const THEME_ICON = { auto: '🖥️', light: '☀️', dark: '🌙' };
+
+function readTheme() {
+  let t = null;
+  try { t = localStorage.getItem('theme'); } catch { /* storage blocked */ }
+  return THEMES.includes(t) ? t : 'auto';
+}
+
+// Pin the chosen theme via data-theme on <html> (or remove it for "auto", which
+// lets the stylesheet's prefers-color-scheme media query follow the device).
+function applyTheme(theme) {
+  if (theme === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = theme;
+  const btn = el('theme-toggle');
+  const label = theme[0].toUpperCase() + theme.slice(1);
+  btn.textContent = `${THEME_ICON[theme]} ${label}`;
+  btn.setAttribute('aria-label', `Theme: ${label} (click to change)`);
+  btn.title = btn.getAttribute('aria-label');
+}
+
+function initTheme() {
+  applyTheme(readTheme());
+  el('theme-toggle').addEventListener('click', () => {
+    const next = THEMES[(THEMES.indexOf(readTheme()) + 1) % THEMES.length];
+    try { localStorage.setItem('theme', next); } catch { /* storage blocked */ }
+    applyTheme(next);
+  });
+}
+
 async function init() {
+  initTheme();
   buildChips();
   selectScript(currentScript);
   buildLangOptions();
