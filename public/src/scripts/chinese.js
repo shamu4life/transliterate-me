@@ -35,6 +35,10 @@ const CODA_FINAL = {
   M: 'u', L: 'er', N: 'en', NG: 'eng', // R coda is handled separately (-> 尔)
 };
 
+// Sibilants are the most salient coda consonants (and the ones loanwords keep,
+// e.g. the -s plural), so a collapsed cluster always retains one.
+const SIBILANT = new Set(['S', 'Z', 'SH', 'ZH', 'CH', 'JH']);
+
 // Build a legal final from a vowel and an optional nasal coda ('n' | 'ng').
 function buildFinal(vowel, coda, hasOnset) {
   if (!coda) {
@@ -137,6 +141,29 @@ const FINAL_BASE = {
   ang: 'a', eng: 'e', ing: 'i', ong: 'o', an: 'a', en: 'e', in: 'i', un: 'u',
 };
 
+// A coda/cluster consonant with no following vowel, made into its own syllable
+// by appending an epenthetic vowel. R-colouring is the special case -> 尔.
+function codaSyllable(c) {
+  if (c === 'R') return ['', 'er'];
+  return [INIT[c] || '', CODA_FINAL[c] || 'e'];
+}
+
+// Reduce a run of coda consonants (each with no following vowel) to the
+// syllables worth pronouncing. Mandarin has no consonant clusters and only
+// -n/-ng/-r codas, so every other coda consonant would otherwise spawn a full
+// epenthetic syllable — turning "texts" (1 syllable) into 特克斯特斯 (5) and
+// reading as disjointed staccato through a Mandarin TTS. Runs longer than
+// MAX_CODA collapse to their most salient consonants: the first, plus a
+// trailing sibilant if any. Shorter runs are kept intact. (Tune MAX_CODA to
+// trade fidelity for fluency.)
+const MAX_CODA = 2;
+function reduceCoda(run) {
+  if (run.length <= MAX_CODA) return run;
+  let lastSib = -1;
+  for (let r = 1; r < run.length; r += 1) if (SIBILANT.has(run[r])) lastSib = r;
+  return lastSib > 0 ? [run[0], run[lastSib]] : [run[0]];
+}
+
 export function toChinese(phonemes) {
   const p = stripStress(phonemes);
   const syl = []; // [init, final]
@@ -163,14 +190,19 @@ export function toChinese(phonemes) {
     } else if (isVowel(p[i + 1])) {
       const init = INIT[cur]; const v = p[i + 1]; i += 2;
       syl.push([init, buildFinal(v, takeCoda(), true)]);
-    } else if (cur === 'R') {
-      // r-colouring with no following vowel -> 尔 (not the l-based 勒)
-      syl.push(['', 'er']);
-      i += 1;
     } else {
-      // coda/cluster consonant with no following vowel -> its own syllable
-      syl.push([INIT[cur] || '', CODA_FINAL[cur] || 'e']);
-      i += 1;
+      // A maximal run of coda/cluster consonants (each followed by a non-vowel).
+      // Gather it, then keep only the syllables worth pronouncing so long
+      // clusters do not explode into staccato epenthetic syllables.
+      let k = i;
+      while (k < p.length && !isVowel(p[k]) && p[k] !== 'ː' && !isVowel(p[k + 1])) k += 1;
+      for (const c of reduceCoda(p.slice(i, k))) {
+        const s = codaSyllable(c);
+        const prev = syl[syl.length - 1];
+        if (prev && prev[0] === s[0] && prev[1] === s[1]) continue; // drop 斯斯 repeats
+        syl.push(s);
+      }
+      i = k;
     }
   }
   return syl.map(([init, final]) => charFor(init, final)).join('');

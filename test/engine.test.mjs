@@ -96,6 +96,19 @@ test('Chinese transliteration produces only Han characters (no pinyin leak)', ()
   }
 });
 
+// A long coda consonant cluster has no Mandarin equivalent: each consonant
+// would otherwise become its own epenthetic syllable, reading as disjointed
+// staccato through a TTS. Clusters of 3+ collapse to the first consonant plus a
+// trailing sibilant; shorter codas are left intact.
+test('Chinese collapses long coda clusters instead of exploding them', () => {
+  // "texts" /t ɛ k s t s/ would be 特克斯特斯 (5 syllables) without collapsing.
+  assert.equal(transliteratePhonemes(['T', 'EH1', 'K', 'S', 'T', 'S'], 'chinese'), '特克斯');
+  // "sixths" /s ɪ k s θ s/ keeps the salient k and a single trailing sibilant.
+  assert.equal(transliteratePhonemes(['S', 'IH1', 'K', 'S', 'TH', 'S'], 'chinese'), '斯克斯');
+  // A 2-consonant coda is short enough to keep intact (matches the world golden).
+  assert.equal(transliteratePhonemes(['W', 'ER1', 'L', 'D'], 'chinese'), '沃勒德');
+});
+
 test('words containing the ʒ sound transliterate everywhere', () => {
   for (const word of ['vision', 'measure', 'genre']) {
     const toks = phonemizeText(word, dict);
