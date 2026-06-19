@@ -45,10 +45,11 @@ export function transliteratePhonemes(phonemes, scriptId) {
 // Non-word tokens (spaces, punctuation) pass through unchanged, except that for
 // scripts with a `wordSep` a run of spaces/tabs sitting between two words is
 // replaced by that separator (the interpunct/nakaguro). Newlines and any
-// punctuation are left intact so the original layout survives.
-export function transliterateTokens(tokens, scriptId) {
+// punctuation are left intact so the original layout survives. Pass
+// `{ separate: false }` to keep ordinary spaces instead of the separator.
+export function transliterateTokens(tokens, scriptId, { separate = true } = {}) {
   const script = BY_ID.get(scriptId);
-  const sep = script && script.wordSep;
+  const sep = separate && script && script.wordSep;
   let out = '';
   for (let i = 0; i < tokens.length; i += 1) {
     const t = tokens[i];

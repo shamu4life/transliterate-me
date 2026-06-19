@@ -234,6 +234,17 @@ textarea:focus,
   min-height: 1.2em;
 }
 
+.sep-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.sep-toggle input { accent-color: var(--accent); cursor: pointer; }
+
 .quality-badge {
   display: inline-block;
   font-size: 0.72rem;
