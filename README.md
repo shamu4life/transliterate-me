@@ -1,12 +1,16 @@
-# Transliterate Me
+<p align="center">
+  <img src="docs/social-preview.png" alt="Transliterate Me — phonetic transliteration in the browser, via IPA" width="820" />
+</p>
 
-[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![CI](https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml/badge.svg)](https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml)
-![Dependencies: zero](https://img.shields.io/badge/dependencies-0-brightgreen)
-![100% client-side](https://img.shields.io/badge/runs-100%25%20client--side-success)
-[![Deploy: Cloudflare Workers](https://img.shields.io/badge/deploy-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/static-assets/)
+<p align="center">
+  <a href="LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/license-GPLv3-blue.svg" /></a>
+  <a href="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml/badge.svg" /></a>
+  <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-0-brightgreen" />
+  <img alt="100% client-side" src="https://img.shields.io/badge/runs-100%25%20client--side-success" />
+  <a href="https://developers.cloudflare.com/workers/static-assets/"><img alt="Deploy: Cloudflare Workers" src="https://img.shields.io/badge/deploy-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white" /></a>
+</p>
 
-**▶ [Try it live](https://funny-words.uwutoowo.com/)** — no install, runs entirely in your browser.
+<p align="center"><b>▶ <a href="https://funny-words.uwutoowo.com/">Try it live</a></b> — no install, runs entirely in your browser.</p>
 
 Move text between writing systems **by its sound**, in two directions:
 
