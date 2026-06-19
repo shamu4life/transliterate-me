@@ -117,6 +117,9 @@ test('Chinese and Katakana separate words with the idiomatic interpunct', () => 
   assert.equal(transliterateTokens(toks, 'chinese'), '哈楼·沃勒德');
   assert.equal(transliterateTokens(toks, 'katakana'), 'ハロー・ワールド');
   assert.equal(transliterateTokens(toks, 'cyrillic'), 'хало вэрлд'); // spaced script unchanged
+  // The separator is on by default but can be turned off (falls back to spaces).
+  assert.equal(transliterateTokens(toks, 'chinese', { separate: false }), '哈楼 沃勒德');
+  assert.equal(transliterateTokens(toks, 'katakana', { separate: false }), 'ハロー ワールド');
   // A separator token carrying punctuation is left alone (no interpunct added).
   assert.doesNotMatch(transliterateTokens(phonemizeText('hi, there', dict), 'chinese'), /·/);
   // Newlines are preserved so the original layout survives.

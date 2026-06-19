@@ -36,6 +36,10 @@ let cmudict = null;
 let currentScript = SCRIPTS[0].id;
 let currentLang = 'en';
 let fwdToken = 0; // guards against out-of-order async forward renders
+// Word-separator preference (· / ・). On by default; remembered when toggled off.
+let separateWords = (() => {
+  try { return localStorage.getItem('wordSep') !== 'off'; } catch { return true; }
+})();
 
 // ---- Romanize mode state ----
 let pinyinFn = null; // pinyin-pro's pinyin(), lazy-loaded
@@ -67,7 +71,22 @@ function selectScript(id) {
   const s = getScript(id);
   el('quality-note').innerHTML =
     `<span class="quality-badge ${s.quality}">${s.quality}</span>${s.note || QUALITY_TEXT[s.quality]}`;
+  updateSepToggle();
   renderForward();
+}
+
+// The word-separator toggle is only meaningful for scripts that use one
+// (Chinese ·, Katakana ・); hide it for the rest.
+function updateSepToggle() {
+  const s = getScript(currentScript);
+  const label = el('sep-toggle-label');
+  if (s.wordSep) {
+    el('sep-toggle-text').textContent = `Separate words with “${s.wordSep}”`;
+    el('sep-toggle').checked = separateWords;
+    label.hidden = false;
+  } else {
+    label.hidden = true;
+  }
 }
 
 function buildLangOptions() {
@@ -116,7 +135,7 @@ async function renderForward() {
 
 function renderForwardTokens(tokens) {
   const script = getScript(currentScript);
-  el('output-text').textContent = transliterateTokens(tokens, currentScript) || ' ';
+  el('output-text').textContent = transliterateTokens(tokens, currentScript, { separate: separateWords }) || ' ';
   el('output-text').dir = script.rtl ? 'rtl' : 'ltr';
   el('ipa-text').textContent =
     tokens.map((t) => (t.type === 'word' ? t.ipa : t.text)).join('') || ' ';
@@ -226,7 +245,6 @@ function wireCopy(buttonId, sourceId) {
 
 // ---- Theme: auto (follow device) / light / dark, remembered ----
 const THEMES = ['auto', 'light', 'dark'];
-const THEME_ICON = { auto: '🖥️', light: '☀️', dark: '🌙' };
 
 function readTheme() {
   let t = null;
@@ -235,24 +253,26 @@ function readTheme() {
 }
 
 // Pin the chosen theme via data-theme on <html> (or remove it for "auto", which
-// lets the stylesheet's prefers-color-scheme media query follow the device).
+// lets the stylesheet's prefers-color-scheme media query follow the device),
+// and reflect the active choice in the segmented slider.
 function applyTheme(theme) {
   if (theme === 'auto') delete document.documentElement.dataset.theme;
   else document.documentElement.dataset.theme = theme;
-  const btn = el('theme-toggle');
-  const label = theme[0].toUpperCase() + theme.slice(1);
-  btn.textContent = `${THEME_ICON[theme]} ${label}`;
-  btn.setAttribute('aria-label', `Theme: ${label} (click to change)`);
-  btn.title = btn.getAttribute('aria-label');
+  const sw = el('theme-switch');
+  sw.dataset.active = theme;
+  for (const opt of sw.querySelectorAll('.theme-opt')) {
+    opt.setAttribute('aria-pressed', String(opt.dataset.themeChoice === theme));
+  }
 }
 
 function initTheme() {
   applyTheme(readTheme());
-  el('theme-toggle').addEventListener('click', () => {
-    const next = THEMES[(THEMES.indexOf(readTheme()) + 1) % THEMES.length];
-    try { localStorage.setItem('theme', next); } catch { /* storage blocked */ }
-    applyTheme(next);
-  });
+  for (const opt of el('theme-switch').querySelectorAll('.theme-opt')) {
+    opt.addEventListener('click', () => {
+      try { localStorage.setItem('theme', opt.dataset.themeChoice); } catch { /* storage blocked */ }
+      applyTheme(opt.dataset.themeChoice);
+    });
+  }
 }
 
 async function init() {
@@ -271,6 +291,11 @@ async function init() {
   el('rom-tones').addEventListener('change', renderRomanize);
   wireCopy('copy-btn', 'output-text');
   wireCopy('rom-copy', 'rom-output');
+  el('sep-toggle').addEventListener('change', () => {
+    separateWords = el('sep-toggle').checked;
+    try { localStorage.setItem('wordSep', separateWords ? 'on' : 'off'); } catch { /* storage blocked */ }
+    renderForward();
+  });
 
   try {
     const res = await fetch('./data/cmudict.txt');
