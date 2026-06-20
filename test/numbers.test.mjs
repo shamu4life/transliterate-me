@@ -62,6 +62,8 @@ test('fractions (idiomatic)', () => {
   assert.equal(numberToWords('1/100'), 'one hundredth');
   assert.equal(numberToWords('4/1'), 'four');
   assert.equal(numberToWords('1/0'), '1/0'); // degenerate: original text
+  assert.equal(numberToWords('1/21'), 'one twenty first'); // compound denominator
+  assert.equal(numberToWords('3/100'), 'three hundredths'); // round denominator, plural
 });
 
 test('fractionToCommaDecimal', () => {

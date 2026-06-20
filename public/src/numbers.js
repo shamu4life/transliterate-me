@@ -101,16 +101,16 @@ function currencyWords(raw, unit) {
   return `${cardinal(dollars)} ${unit}${Number(dollars) === 1 ? '' : 's'}`;
 }
 
-// Ordinal form of a denominator (just the final ordinal word, no prefix).
+// Ordinal form of a denominator (drop the redundant leading "one" of round
+// scales: "one hundredth" -> "hundredth", but keep compound "twenty first").
 function denominatorOrdinal(denStr) {
   const den = Number(denStr);
   if (den === 1) return null;
   if (den === 2) return 'half';
   if (den === 4) return 'quarter';
-  // For other denominators, get the ordinal and extract just the last word.
-  const ord = ordinal(denStr);
-  const parts = ord.split(' ');
-  return parts[parts.length - 1];
+  let ord = ordinal(denStr);
+  if (ord.startsWith('one ')) ord = ord.slice(4);
+  return ord;
 }
 
 // Idiomatic English fraction words, or null for a/0 (caller falls back).
