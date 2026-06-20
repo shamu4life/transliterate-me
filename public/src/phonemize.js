@@ -9,10 +9,42 @@
 import { arpabetToIpa } from './arpabet.js';
 import { g2p as englishG2p } from './g2p.js';
 import { ipaToArpabet } from './ipa2arpabet.js';
+import { NUMBER_SRC, numberToWords } from './numbers.js';
 
 // Words may contain accented Latin letters (café, niño, Kraków, schön): Latin-1
 // Supplement letters and Latin Extended-A, plus internal apostrophes.
-const WORD_RE = /[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*/g;
+const WORD_RE = /[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:[''][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*/g;
+
+// Word source shared with the master tokenizer (same class as WORD_RE).
+const WORD_SRC = "[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:[''][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*";
+// NUMBER first so "300" wins over a letter run; group 1 = number, group 2 = word.
+const TOKEN_RE = new RegExp(`(${NUMBER_SRC})|(${WORD_SRC})`, 'giu');
+
+// Split text into word/other tokens. Numbers are word tokens tagged `numeric`.
+// A leading "-" immediately before a number is folded in as a sign only when it
+// is not itself preceded by a letter or digit (so "3-5" and "page-3" are ranges/
+// hyphens, while " -5" and "(-5)" are negative).
+export function tokenize(text) {
+  const tokens = [];
+  let last = 0;
+  let m;
+  TOKEN_RE.lastIndex = 0;
+  while ((m = TOKEN_RE.exec(text)) !== null) {
+    let start = m.index;
+    let value = m[0];
+    const numeric = m[1] !== undefined;
+    if (numeric && start > 0 && text[start - 1] === '-'
+        && !/[A-Za-z0-9]/.test(text[start - 2] || '')) {
+      start -= 1;
+      value = `-${value}`;
+    }
+    if (start > last) tokens.push({ type: 'other', text: text.slice(last, start) });
+    tokens.push({ type: 'word', text: value, numeric });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) tokens.push({ type: 'other', text: text.slice(last) });
+  return tokens;
+}
 
 // Look up a single word's pronunciation. Tries the dictionary first (if given),
 // then the rule-based g2p. Returns { phonemes, source } or null.
@@ -31,28 +63,26 @@ export function phonemizeWord(word, dict, g2p = englishG2p) {
 }
 
 // Split text into word and non-word tokens, attaching pronunciation data.
+// Numeric tokens are spelled out (numberToWords) then phonemized word-by-word.
 export function phonemizeText(text, dict, g2p = englishG2p) {
-  const tokens = [];
-  let last = 0;
-  let m;
-  WORD_RE.lastIndex = 0;
-  while ((m = WORD_RE.exec(text)) !== null) {
-    if (m.index > last) {
-      tokens.push({ type: 'other', text: text.slice(last, m.index) });
+  const tokens = tokenize(text);
+  for (const tok of tokens) {
+    if (tok.type !== 'word') continue;
+    if (tok.numeric) {
+      const phon = [];
+      for (const w of numberToWords(tok.text).split(' ')) {
+        const pron = phonemizeWord(w, dict, g2p);
+        if (pron) phon.push(...pron.phonemes);
+      }
+      tok.phonemes = phon;
+      tok.ipa = phon.length ? arpabetToIpa(phon) : '';
+      tok.source = phon.length ? 'number' : 'none';
+    } else {
+      const pron = phonemizeWord(tok.text, dict, g2p);
+      tok.phonemes = pron ? pron.phonemes : [];
+      tok.ipa = pron ? arpabetToIpa(pron.phonemes) : '';
+      tok.source = pron ? pron.source : 'none';
     }
-    const word = m[0];
-    const pron = phonemizeWord(word, dict, g2p);
-    tokens.push({
-      type: 'word',
-      text: word,
-      phonemes: pron ? pron.phonemes : [],
-      ipa: pron ? arpabetToIpa(pron.phonemes) : '',
-      source: pron ? pron.source : 'none',
-    });
-    last = WORD_RE.lastIndex;
-  }
-  if (last < text.length) {
-    tokens.push({ type: 'other', text: text.slice(last) });
   }
   return tokens;
 }
