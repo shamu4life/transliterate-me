@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="34%" r="36%">
+      <stop offset="0%" stop-color="#7c8cff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#7c8cff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c8cff"/>
+      <stop offset="100%" stop-color="#4ad9c4"/>
+    </linearGradient>
+  </defs>
+  <!-- Dark background -->
+  <rect width="1280" height="640" fill="#0f1220"/>
+  <!-- Subtle glow behind the script motif -->
+  <rect width="1280" height="640" fill="url(#glow)"/>
+  <!-- Script motif: sample glyphs spanning writing systems, in muted brand tones -->
+  <g font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-weight="700" font-size="104" text-anchor="middle">
+    <text x="290" y="262" fill="#7c8cff" opacity="0.85">A</text>
+    <text x="450" y="262" fill="#4ad9c4" opacity="0.80">あ</text>
+    <text x="610" y="262" fill="#9aa3c4" opacity="0.80">한</text>
+    <text x="700" y="262" fill="#7c8cff" opacity="0.85">Я</text>
+    <text x="840" y="262" fill="#4ad9c4" opacity="0.80">α</text>
+    <text x="990" y="262" fill="#9aa3c4" opacity="0.80">ا</text>
+  </g>
+  <!-- Wordmark (light — for dark backgrounds) -->
+  <text x="640" y="412" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-weight="900" font-size="92" text-anchor="middle" letter-spacing="-3"><tspan fill="#e8eaf2">Transliterate </tspan><tspan fill="#4ad9c4">Me</tspan></text>
+  <!-- Tagline -->
+  <text x="640" y="466" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-weight="400" font-size="28" fill="#9aa3c4" text-anchor="middle">Phonetic transliteration in the browser — by sound, via IPA.</text>
+  <!-- URL -->
+  <text x="640" y="516" font-family="system-ui,-apple-system,'Segoe UI',sans-serif" font-weight="600" font-size="22" fill="#7c8cff" text-anchor="middle" letter-spacing="0.5">funny-words.uwutoowo.com</text>
+  <!-- Accent bar (gradient) -->
+  <rect x="0" y="626" width="1280" height="5" fill="url(#bar)"/>
+</svg>

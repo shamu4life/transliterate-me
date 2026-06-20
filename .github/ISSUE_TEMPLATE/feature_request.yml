@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest a new capability or improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: >
+        What problem does this solve, or what limitation does it address?
+        "I want X" is less useful than "When I do Y, I can't Z because…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like it to work? Describe from the user's perspective, not the implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you considered, and why you prefer the proposed one.
+    validations:
+      required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope notes
+      description: >
+        Optional — flag anything that affects scope. This app is deliberately
+        client-side-only: there is no backend and no build step, and everything
+        ships as plain ES modules plus vendored JS/WASM. New scripts, source
+        languages, and romanizers are added via the registries (SCRIPTS in
+        src/transliterate.js, LANGUAGES in src/lang/index.js, SOURCES +
+        src/romanize/detect.js for romanizers), so additions that fit that shape
+        are the easiest to land.
+    validations:
+      required: false
