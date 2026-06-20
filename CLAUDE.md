@@ -55,7 +55,9 @@ real espeak WASM that is skipped if it is absent.
 
 Both directions share a common shape: text is tokenized (words vs.
 whitespace/punctuation, which passes through unchanged), each word is converted,
-and results are rejoined preserving the original layout.
+and results are rejoined preserving the original layout. In the forward
+direction, numerals count as words too — they are spelled out and converted
+(`300` → “three hundred”) rather than passed through.
 
 ### Forward pipeline: language → IPA/ARPABET → script
 
@@ -70,6 +72,14 @@ text → pronunciation → ARPABET phonemes → target script
      g2p fallback (`src/g2p.js`) for unknown words. Instant, offline.
    - **Other 13 languages** (`engine: 'espeak'`) — phonemized to IPA by the
      vendored espeak-ng WASM (`src/lang/espeak.js`), lazy-loaded on first use.
+
+   Numerals are spelled out as part of this step. `tokenize` (`src/phonemize.js`)
+   tags digit runs as word-like `numeric` tokens — composite forms like `$300`,
+   `1st`, `3.14`, `1/2`, and European `1.000,50` stay intact. English expands
+   them with `numberToWords` (`src/numbers.js`); the espeak languages let espeak
+   expand them natively per voice (fractions are decimalized first, via
+   `fractionToCommaDecimal`, since espeak reads a slash literally). Either way the
+   result is tagged `source: 'number'`.
 2. **Normalize to ARPABET.** Everything downstream operates on **ARPABET**
    phoneme arrays. English ARPABET is rendered to IPA only for display
    (`src/arpabet.js`); espeak's IPA is mapped to the nearest ARPABET

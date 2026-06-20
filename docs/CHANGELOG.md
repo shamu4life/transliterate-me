@@ -5,6 +5,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- Forward — **numerals are now spoken, not dropped.** Digits in the input are
+  spelled out and transliterated phonetically, in **all 14 source languages**;
+  previously a number passed straight through as raw text.
+- Forward — broad numeric coverage: **integers, decimals, negatives**, both
+  **US (`1,000.50`) and European (`1.000,50`) grouping**, **years** (read
+  idiomatically — *nineteen ninety-nine*), **ordinals** (`1st`, `2nd`, …),
+  **currency** (`$ £ € ¥`, with yen invariant — *500 yen*, not *500 yens*),
+  **percent**, and **fractions** (`1/2` → *one half*). The European decimal
+  comma is handled by espeak for the non-English languages.
+- Internal — new pure, dependency-free module **`src/numbers.js`**
+  (`numberToWords`, `NUMBER_SRC`, `fractionToCommaDecimal`). English expands
+  numbers via `numberToWords`; the 13 espeak languages send numeric tokens to
+  espeak for native per-voice expansion (fractions are decimalized first because
+  espeak reads a slash literally).
+
+---
+
 ## [1.0.0] — 2026-06-19
 
 Initial public release. Move text between writing systems **by its sound**, in
