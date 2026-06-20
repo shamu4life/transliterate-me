@@ -6,7 +6,7 @@
 <p align="center">
   <a href="docs/CHANGELOG.md"><img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-blue" /></a>
   <a href="LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/license-GPLv3-blue.svg" /></a>
-  <a href="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml/badge.svg" /></a>
+  <a href="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/shamu4life/transliterate-me/ci.yml?label=CI" /></a>
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-0-brightgreen" />
   <img alt="100% client-side" src="https://img.shields.io/badge/runs-100%25%20client--side-success" />
   <a href="https://developers.cloudflare.com/workers/static-assets/"><img alt="Deploy: Cloudflare Workers" src="https://img.shields.io/badge/deploy-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white" /></a>
