@@ -1,8 +1,10 @@
 <p align="center">
-  <img src="docs/social-preview.png" alt="Transliterate Me — phonetic transliteration in the browser, via IPA" width="820" />
+  <img src=".github/social-preview.svg#gh-dark-mode-only" alt="Transliterate Me — phonetic transliteration in the browser, via IPA" width="820">
+  <img src=".github/social-preview-light.svg#gh-light-mode-only" alt="Transliterate Me — phonetic transliteration in the browser, via IPA" width="820">
 </p>
 
 <p align="center">
+  <a href="docs/CHANGELOG.md"><img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-blue" /></a>
   <a href="LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/license-GPLv3-blue.svg" /></a>
   <a href="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml/badge.svg" /></a>
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-0-brightgreen" />
@@ -41,10 +43,11 @@ meaning. So “coffee” becomes コーヒー-style カフィー, not the Japane
 <sub>The forward view (Latin script → world scripts) — switches with your GitHub light/dark theme.</sub>
 
 
-> **Setup note (slim archive):** two large binaries — espeak-ng’s WASM and the
-> kuromoji dictionary (~36 MB total) — are omitted from this archive to keep the
-> download small. Run `./vendor.sh` once (needs Node/npm) to fetch them before the
-> espeak languages and Japanese kanji→romaji will work. Everything else runs as-is.
+> **Setup note:** the two large binaries — espeak-ng’s WASM and the kuromoji
+> dictionary (~36 MB total) — are **committed in this repo** (`public/vendor/`),
+> so it works out of the box: clone or download and the espeak languages and
+> Japanese kanji→romaji work with no extra steps. `./vendor.sh` (needs Node/npm)
+> is only there to **re-fetch/update** those binaries.
 
 ## How it works
 
@@ -209,6 +212,10 @@ test/*.test.mjs                   unit + golden-output tests (both directions)
 - Arabic/Hebrew romanization recovers matres lectionis and any niqqud/harakat,
   but unwritten short vowels in unvocalized text still cannot be recovered
   (that needs an ML diacritizer).
+
+## Contributing
+
+Issues and pull requests are welcome. See **[CONTRIBUTING.md](.github/CONTRIBUTING.md)** for setup, the test and golden-output conventions, the registry-based extension points (how to add a language, script, or romanizer), and the house rules — chief among them: keep it **client-side, dependency-free, plain ES modules**, and keep the vendored license notices intact.
 
 ## License
 

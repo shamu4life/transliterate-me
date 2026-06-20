@@ -20,7 +20,7 @@ JS/WASM. There is no backend, no build step, and no external API calls. `public/
 ```bash
 npm start          # serve public/ at http://localhost:8000 (zero-dependency Node static server)
 npm test           # run the whole suite (node --test, no deps)
-./vendor.sh        # one-time: fetch the two large binaries omitted from the slim archive
+./vendor.sh        # re-fetch/update the two large binaries (already committed; only needed to refresh them)
 ```
 
 Run a single test file or a single test by name:
@@ -35,20 +35,21 @@ There is no lint step and no dependencies to install (`package.json` has no
 modules and the CMU dictionary via `fetch()` — opening `index.html` as
 `file://` will not work.
 
-### vendor.sh — required for full functionality
+### vendor.sh — refreshing the bundled binaries
 
-Two large binaries (~36 MB) are **omitted from the slim archive** and must be
-fetched once with `./vendor.sh` (needs Node/npm) before they work:
+Two large binaries (~36 MB) are **committed in the repo**, so the app works out
+of the box with no extra steps:
 
 - `public/vendor/espeak/espeak-ng.wasm` — needed for the 13 non-English source
   languages.
 - `public/vendor/kuromoji-dict/*.dat.gz` — needed for Japanese kanji→romaji.
 
-Everything else (English forward, all romanizers except JP kanji, the matching
-JS glue/bundles) runs as-is without vendoring. The `engine.test.mjs` and
-`romanize.test.mjs` suites do **not** need the vendored binaries;
-`languages.test.mjs` has an end-to-end test against the real espeak WASM that is
-skipped if it is absent.
+`./vendor.sh` (needs Node/npm) only **re-fetches/updates** these files; you do
+not need to run it to use or develop the project. Everything else (English
+forward, all romanizers except JP kanji, the matching JS glue/bundles) is also
+vendored. The `engine.test.mjs` and `romanize.test.mjs` suites do **not** need
+the vendored binaries; `languages.test.mjs` has an end-to-end test against the
+real espeak WASM that is skipped if it is absent.
 
 ## Architecture
 
@@ -134,10 +135,12 @@ Fully static, no build step. `public/` is published as-is:
 
 - **Cloudflare Workers** (connected integration) — `wrangler.toml` is a Workers
   *static assets* config (no Worker script); Cloudflare serves `public/`
-  directly. Workers Builds runs `wrangler deploy` on each push; manual:
-  `npx wrangler deploy`.
-- **GitHub Pages** — `.github/workflows/deploy.yml` runs `npm test`, then
-  publishes `public/` on every push to `main`.
+  directly. Cloudflare Workers Builds runs `wrangler deploy` on each push to
+  `main`; manual: `npx wrangler deploy`.
+
+The only GitHub Actions workflow is `.github/workflows/ci.yml`, which runs
+`npm test` on pushes to `main` and on pull requests — it does **not** deploy.
+There is no GitHub Pages workflow.
 
 ## License note
 

@@ -1,0 +1,31 @@
+# Dependabot configuration — automated dependency-update PRs.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# This project has no runtime npm dependencies: the JS/WASM libraries it ships
+# (espeak-ng, CMU dict, pinyin-pro, kuroshiro, kuromoji, …) are vendored under
+# public/vendor and updated by hand via vendor.sh, so Dependabot can't see them.
+# The npm entry below therefore mainly future-proofs the repo (it will pick up
+# any dev/runtime npm dependency added later), while the github-actions entry
+# keeps the actions used in CI (.github/workflows/ci.yml) current.
+version: 2
+updates:
+  # GitHub Actions pinned in .github/workflows/ci.yml
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+
+  # npm — no runtime dependencies today; kept to catch any added later.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "dependencies"
