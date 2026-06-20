@@ -9,13 +9,9 @@
 import { arpabetToIpa } from './arpabet.js';
 import { g2p as englishG2p } from './g2p.js';
 import { ipaToArpabet } from './ipa2arpabet.js';
-import { NUMBER_SRC, numberToWords } from './numbers.js';
+import { NUMBER_SRC, numberToWords, fractionToCommaDecimal } from './numbers.js';
 
-// Words may contain accented Latin letters (café, niño, Kraków, schön): Latin-1
-// Supplement letters and Latin Extended-A, plus internal apostrophes.
-const WORD_RE = /[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:[''][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*/g;
-
-// Word source shared with the master tokenizer (same class as WORD_RE).
+// Word source shared with the master tokenizer.
 const WORD_SRC = "[A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+(?:[''][A-Za-zÀ-ÖØ-öø-ÿĀ-ž]+)*";
 // NUMBER first so "300" wins over a letter run; group 1 = number, group 2 = word.
 const TOKEN_RE = new RegExp(`(${NUMBER_SRC})|(${WORD_SRC})`, 'giu');
@@ -87,27 +83,35 @@ export function phonemizeText(text, dict, g2p = englishG2p) {
   return tokens;
 }
 
-// Phonemize text with espeak-ng (for non-English languages). `phonemizeLine` is
-// injected (the espeak wrapper, or a test stub). The whole line is phonemized in
-// one espeak call and the IPA is split back onto the word tokens; on a count
-// mismatch we fall back to per-word phonemization. Token shape matches
-// phonemizeText so the rest of the UI is unchanged.
+// Phonemize text with espeak-ng (non-English). Word tokens are phonemized in one
+// batched espeak call (with a per-word fallback on count mismatch); numeric
+// tokens are phonemized individually — espeak expands them natively per-voice,
+// and individual calls sidestep the whitespace-alignment break when a number
+// expands to several words (e.g. 1999). Fractions are decimalized first because
+// espeak reads a slash literally ("one slash two").
 export async function phonemizeTextEspeak(text, voice, phonemizeLine) {
-  const tokens = [];
-  const wordTokenIdx = [];
+  const tokens = tokenize(text);
+  const wordIdx = [];
   const wordTexts = [];
-  let last = 0;
-  let m;
-  WORD_RE.lastIndex = 0;
-  while ((m = WORD_RE.exec(text)) !== null) {
-    if (m.index > last) tokens.push({ type: 'other', text: text.slice(last, m.index) });
-    wordTokenIdx.push(tokens.length);
-    wordTexts.push(m[0]);
-    tokens.push({ type: 'word', text: m[0], phonemes: [], ipa: '', source: 'espeak' });
-    last = WORD_RE.lastIndex;
+  for (let i = 0; i < tokens.length; i += 1) {
+    const tok = tokens[i];
+    if (tok.type !== 'word') continue;
+    if (tok.numeric) {
+      const send = tok.text.includes('/')
+        ? (fractionToCommaDecimal(tok.text) || tok.text)
+        : tok.text;
+      const ipa = (await phonemizeLine(send, voice)).trim();
+      tok.ipa = ipa;
+      tok.phonemes = ipaToArpabet(ipa);
+      tok.source = 'number';
+    } else {
+      tok.ipa = '';
+      tok.phonemes = [];
+      tok.source = 'espeak';
+      wordIdx.push(i);
+      wordTexts.push(tok.text);
+    }
   }
-  if (last < text.length) tokens.push({ type: 'other', text: text.slice(last) });
-
   if (wordTexts.length) {
     const line = await phonemizeLine(wordTexts.join(' '), voice);
     let ipaWords = line.split(/\s+/).filter(Boolean);
@@ -116,7 +120,7 @@ export async function phonemizeTextEspeak(text, voice, phonemizeLine) {
       for (const w of wordTexts) ipaWords.push((await phonemizeLine(w, voice)).trim());
     }
     wordTexts.forEach((_, k) => {
-      const tok = tokens[wordTokenIdx[k]];
+      const tok = tokens[wordIdx[k]];
       tok.ipa = ipaWords[k] || '';
       tok.phonemes = ipaToArpabet(tok.ipa);
     });
