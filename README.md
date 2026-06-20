@@ -20,7 +20,9 @@ Move text between writing systems **by its sound**, in two directions:
   (English, Spanish, French, German, Italian, Portuguese, Dutch, Polish,
   Catalan, Romanian, Czech, Swedish, Danish, Turkish), see its **IPA
   pronunciation**, and transliterate the *sound* into Japanese, Korean, Russian,
-  Greek, Arabic, Hebrew, or (approximately) Chinese.
+  Greek, Arabic, Hebrew, or (approximately) Chinese. **Numbers are spoken too** —
+  `300` becomes “three hundred” (also decimals, years, ordinals, currency,
+  percentages, and fractions).
 - **Any script → Latin.** Paste Chinese, Japanese, Korean, Russian, Greek,
   Arabic, or Hebrew and **romanize** it back into the Latin alphabet
   (Chinese → Pīnyīn with tone marks, Japanese → Romaji, Korean → Revised
@@ -65,7 +67,11 @@ English text  →  IPA / phonemes  →  target script
    rule-based fallback (`src/g2p.js`) — instant and offline. For **every other
    language**, the vendored [espeak-ng][espeak] WASM engine produces IPA
    (`src/lang/espeak.js`); its ~18.5 MB data loads lazily on first non-English
-   use. Pick the source language from the dropdown.
+   use. Pick the source language from the dropdown. **Numerals are spelled out
+   and pronounced** (`src/numbers.js`): `300` is read as “three hundred” before
+   transliteration — covering decimals, negatives, years, ordinals, currency,
+   percentages, and fractions — in English via a built-in number speller, and in
+   the other 13 languages via espeak’s native per-voice expansion.
 2. **Pronunciation → IPA / ARPABET.** English ARPABET is rendered to IPA for
    display (`src/arpabet.js`); espeak's IPA is shown directly and mapped to the
    nearest ARPABET phonemes (`src/ipa2arpabet.js`) so the transliterators below
