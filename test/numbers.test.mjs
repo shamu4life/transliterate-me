@@ -47,6 +47,11 @@ test('currency', () => {
   assert.equal(numberToWords('$3.50'), 'three dollars and fifty cents');
   assert.equal(numberToWords('$0.99'), 'ninety nine cents');
   assert.equal(numberToWords('£5'), 'five pounds');
+  assert.equal(numberToWords('€300'), 'three hundred euros');
+  assert.equal(numberToWords('¥500'), 'five hundred yen'); // yen has no plural -s
+  assert.equal(numberToWords('¥1'), 'one yen');
+  // 3+ decimal places aren't cents — read the amount rather than silently dropping it.
+  assert.equal(numberToWords('$3.500'), 'three point five zero zero dollars');
 });
 
 test('percent', () => {
