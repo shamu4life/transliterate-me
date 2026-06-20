@@ -49,6 +49,16 @@ test('phonemizeTextEspeak aligns IPA onto word tokens (stub engine)', async () =
   assert.ok(tokens.some((t) => t.type === 'other' && t.text.includes('!')));
 });
 
+test('phonemizeTextEspeak phonemizes number tokens individually', async () => {
+  // Stub returns one IPA token ("tˈest") per whitespace-separated word.
+  const phon = async (line) => line.split(' ').map(() => 'tˈest').join(' ');
+  const tokens = await phonemizeTextEspeak('tengo 300', 'es', phon);
+  const num = tokens.find((t) => t.text === '300');
+  assert.ok(num, 'number token present');
+  assert.equal(num.source, 'number');
+  assert.ok(num.phonemes.length > 0, 'number token has phonemes');
+});
+
 test('language registry: English uses the dictionary, others use espeak', () => {
   const en = LANGUAGES.find((l) => l.id === 'en');
   assert.equal(en.engine, 'dict');
@@ -78,6 +88,8 @@ test('vendored espeak-ng phonemizes multiple languages end-to-end', async () => 
     ['fr', 'bonjour'],
     ['de', 'Straße'],
     ['it', 'ciao'],
+    ['es', 'tengo 1,5 euros'], // European decimal comma → "uno coma cinco"
+    ['de', 'media 1/2'],       // fraction → decimalized → "null komma fünf"
   ];
   for (const [voice, text] of cases) {
     const tokens = await phonemizeTextEspeak(text, voice, phonemizeLine);
@@ -85,7 +97,9 @@ test('vendored espeak-ng phonemizes multiple languages end-to-end', async () => 
     assert.ok(words.every((w) => w.ipa.length > 0), `${voice}: every word has IPA`);
     assert.ok(words.every((w) => w.phonemes.length > 0), `${voice}: every word has phonemes`);
     for (const s of SCRIPTS) {
-      assert.ok(transliterateTokens(tokens, s.id).length > 0, `${text} -> ${s.id}`);
+      const out = transliterateTokens(tokens, s.id);
+      assert.ok(out.length > 0, `${text} -> ${s.id}`);
+      assert.doesNotMatch(out, /[0-9]/, `${text} -> ${s.id} still has digits`);
     }
   }
 });

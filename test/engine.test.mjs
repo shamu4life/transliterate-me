@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { parseCmudict } from '../public/src/dict.js';
 import { arpabetToIpa } from '../public/src/arpabet.js';
 import { g2p } from '../public/src/g2p.js';
-import { phonemizeText, phonemizeWord } from '../public/src/phonemize.js';
+import { phonemizeText, phonemizeWord, tokenize } from '../public/src/phonemize.js';
 import { transliterateTokens, transliteratePhonemes, SCRIPTS } from '../public/src/transliterate.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -133,4 +133,42 @@ test('words containing the ʒ sound transliterate everywhere', () => {
       assert.ok(transliterateTokens(toks, s.id).length > 0, `${word} -> ${s.id}`);
     }
   }
+});
+
+test('tokenize: numbers are numeric word tokens, layout preserved', () => {
+  const toks = tokenize('I have 300 kills.');
+  assert.equal(toks.map((t) => t.text).join(''), 'I have 300 kills.');
+  const num = toks.find((t) => t.text === '300');
+  assert.ok(num && num.type === 'word' && num.numeric === true);
+});
+
+test('tokenize: hyphens and ranges are not negative numbers', () => {
+  // Al-Quaeda: two words, the hyphen is an "other" token, no numeric tokens.
+  const al = tokenize('Al-Quaeda');
+  assert.deepEqual(al.filter((t) => t.numeric).map((t) => t.text), []);
+  // 3-5: two separate numbers, the hyphen is "other" (a range, not minus five).
+  const range = tokenize('3-5');
+  assert.deepEqual(range.filter((t) => t.numeric).map((t) => t.text), ['3', '5']);
+  // A real leading minus is folded in as a sign.
+  const neg = tokenize('it is -5 today');
+  assert.ok(neg.some((t) => t.numeric && t.text === '-5'));
+});
+
+test('English numbers are spelled out and transliterated', () => {
+  // 300 → "three hundred"; one number = one unit (no internal interpunct).
+  assert.equal(transliterateTokens(phonemizeText('300', dict), 'chinese'), '斯里汉德拉德');
+  assert.equal(transliterateTokens(phonemizeText('300', dict), 'katakana'), 'スリーハンドラド');
+  // Fraction, ordinal, year.
+  assert.equal(transliterateTokens(phonemizeText('1/2', dict), 'chinese'), '万海夫');
+  assert.equal(transliterateTokens(phonemizeText('21st', dict), 'chinese'), '特文蒂佛斯特');
+  assert.equal(transliterateTokens(phonemizeText('2019', dict), 'chinese'), '特文蒂南丁');
+  // A number sits between words with the idiomatic interpunct.
+  assert.equal(transliterateTokens(phonemizeText('over 300 kills', dict), 'chinese'),
+    '欧佛·斯里汉德拉德·基勒兹');
+});
+
+test('no ASCII digits survive English forward output', () => {
+  const out = transliterateTokens(
+    phonemizeText('I have 300 kills and 21st place in 2019', dict), 'chinese');
+  assert.doesNotMatch(out, /[0-9]/, out);
 });
