@@ -146,7 +146,7 @@ function renderForwardTokens(tokens) {
     if (t.type !== 'word') continue;
     const tr = document.createElement('tr');
     const target = transliteratePhonemes(t.phonemes, currentScript) || '—';
-    const srcLabel = { dict: 'dictionary', rule: 'rules', espeak: 'espeak-ng', none: 'unknown' }[t.source];
+    const srcLabel = { dict: 'dictionary', rule: 'rules', espeak: 'espeak-ng', number: 'number', none: 'unknown' }[t.source];
     tr.innerHTML = `
       <td>${escapeHtml(t.text)}</td>
       <td class="ipa">${escapeHtml(t.ipa || '—')}</td>
