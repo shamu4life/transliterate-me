@@ -86,26 +86,32 @@ function numberValue(t) {
 
 const CURRENCY = { $: 'dollar', '£': 'pound', '€': 'euro', '¥': 'yen' };
 
+// Plural of a currency unit. Yen is invariant ("500 yen"); the rest take -s.
+function pluralizeUnit(unit, n) {
+  return n === 1 || unit === 'yen' ? unit : `${unit}s`;
+}
+
 function currencyWords(raw, unit) {
   const t = raw.replace(/,/g, '');
   const dm = /^(\d*)\.(\d{1,2})$/.exec(t);
   if (dm) {
     const dollars = dm[1] || '0';
     const cents = String(Number(dm[2].padEnd(2, '0')));
-    const dPart = Number(dollars) === 0 ? '' : `${cardinal(dollars)} ${unit}${Number(dollars) === 1 ? '' : 's'}`;
+    const dPart = Number(dollars) === 0 ? '' : `${cardinal(dollars)} ${pluralizeUnit(unit, Number(dollars))}`;
     const cPart = Number(cents) === 0 ? '' : `${cardinal(cents)} cent${Number(cents) === 1 ? '' : 's'}`;
     if (dPart && cPart) return `${dPart} and ${cPart}`;
-    return dPart || cPart || `zero ${unit}s`;
+    return dPart || cPart || `zero ${pluralizeUnit(unit, 0)}`;
   }
-  const dollars = t.replace(/\.\d*$/, '') || '0';
-  return `${cardinal(dollars)} ${unit}${Number(dollars) === 1 ? '' : 's'}`;
+  // Plain integer or an odd decimal (e.g. 3.500): read the amount via numberValue
+  // so digits are never silently dropped, then attach the unit.
+  return `${numberValue(t)} ${pluralizeUnit(unit, t === '1' ? 1 : 2)}`;
 }
 
 // Ordinal form of a denominator (drop the redundant leading "one" of round
 // scales: "one hundredth" -> "hundredth", but keep compound "twenty first").
+// Only ever called for den >= 2 (fractionWords handles 0 and 1 first).
 function denominatorOrdinal(denStr) {
   const den = Number(denStr);
-  if (den === 1) return null;
   if (den === 2) return 'half';
   if (den === 4) return 'quarter';
   let ord = ordinal(denStr);
@@ -120,7 +126,6 @@ function fractionWords(numStr, denStr) {
   if (den === 1) return cardinal(numStr);
   const num = Number(numStr);
   let name = denominatorOrdinal(denStr);
-  if (name === null) return null;
   if (num !== 1) name = name === 'half' ? 'halves' : `${name}s`;
   if (num === 1) return `one ${name}`;
   return `${cardinal(numStr)} ${name}`;
