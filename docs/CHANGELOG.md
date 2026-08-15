@@ -25,6 +25,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.0.1] - 2026-08-14
+
+### Changed
+- Every word a reader sees was rewritten to drop the tells of machine-written
+  prose: em and en dashes, curly quotes, boldface applied out of habit, and
+  headings in Title Case. This covers the app's on-screen copy, the README, the
+  contributor docs, the issue templates, and the text rendered into both
+  social-preview cards. No behaviour changed, and no figure, filename or
+  identifier moved.
+- `CONTRIBUTING.md` prescribed the em-dash changelog style this release removes,
+  down to telling contributors to open every bullet with one. It now prescribes
+  the hyphen form Keep a Changelog specifies, and a colon after the area name.
+
 ## [1.0.0] - 2026-06-19
 
 Initial public release. Move text between writing systems by its sound, in

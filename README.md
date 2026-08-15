@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/CHANGELOG.md"><img alt="Version 1.0.0" src="https://img.shields.io/badge/version-1.0.0-blue" /></a>
+  <a href="docs/CHANGELOG.md"><img alt="Version 1.0.1" src="https://img.shields.io/badge/version-1.0.1-blue" /></a>
   <a href="LICENSE"><img alt="License: GPL v3" src="https://img.shields.io/badge/license-GPLv3-blue.svg" /></a>
   <a href="https://github.com/shamu4life/transliterate-me/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/shamu4life/transliterate-me/ci.yml?label=CI" /></a>
   <img alt="Dependencies: zero" src="https://img.shields.io/badge/dependencies-0-brightgreen" />

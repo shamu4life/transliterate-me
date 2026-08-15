@@ -14,7 +14,7 @@ import { LANGUAGES, getLanguage } from './src/lang/index.js';
 import { initEspeak, phonemizeLine, isEspeakReady } from './src/lang/espeak.js';
 
 const QUALITY_TEXT = {
-  good: 'Maps cleanly from pronunciation — a faithful phonetic rendering.',
+  good: 'Maps cleanly from pronunciation: a faithful phonetic rendering.',
   fair: 'Approximate: this script lacks some English sounds, so a few are merged.',
   rough: 'Experimental: only a rough, nearest-equivalent guess.',
 };
@@ -27,7 +27,7 @@ const SOURCE_LABEL = {
 const el = (id) => document.getElementById(id);
 
 const LANG_NOTE = {
-  dict: 'Uses the CMU pronunciation dictionary (American English) — instant, offline.',
+  dict: 'Uses the CMU pronunciation dictionary (American English). Instant, offline.',
   espeak: 'Pronunciation by espeak-ng (GPL-3.0). Loads a ~18.5 MB engine on first non-English use.',
 };
 
@@ -81,7 +81,7 @@ function updateSepToggle() {
   const s = getScript(currentScript);
   const label = el('sep-toggle-label');
   if (s.wordSep) {
-    el('sep-toggle-text').textContent = `Separate words with “${s.wordSep}”`;
+    el('sep-toggle-text').textContent = `Separate words with "${s.wordSep}"`;
     el('sep-toggle').checked = separateWords;
     label.hidden = false;
   } else {
