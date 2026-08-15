@@ -7,9 +7,9 @@ body:
     attributes:
       label: What happened
       description: >
-        A clear, concise description of the bug. Note that transliteration here is
-        *phonetic* and lossy by design — it reproduces how text sounds, not its
-        meaning — so output that looks wrong but plausible (a collapsed sound, an
+        A clear, concise description of the bug. Transliteration here is
+        *phonetic* and lossy by design, reproducing how text sounds rather than what
+        it means, so output that looks wrong but plausible (a collapsed sound, an
         approximate Chinese character) may be expected. Flag it anyway if it seems
         off and we'll confirm.
     validations:
@@ -79,6 +79,6 @@ body:
     id: context
     attributes:
       label: Additional context
-      description: Console errors, the source language and target script in use, screenshots, screen recordings — anything that helps.
+      description: Console errors, the source language and target script in use, screenshots, screen recordings, anything that helps.
     validations:
       required: false

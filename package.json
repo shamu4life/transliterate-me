@@ -1,6 +1,6 @@
 {
   "name": "transliterate-me",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Transliterate text between writing systems by way of IPA pronunciation.",
   "type": "module",
   "license": "GPL-3.0-or-later",
